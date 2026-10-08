@@ -14,9 +14,11 @@ claude.ai pelo navegador nem no celular.
 
 1. Baixe o arquivo `escoladobreno.mcpb` na página de
    [releases](https://github.com/andreferrazz/escoladobreno-mcp/releases/latest).
-2. Abra o arquivo (duplo clique). O Claude mostra uma tela de instalação. Se o duplo clique não
-   abrir o Claude, vá em **Ajustes → Extensões** e arraste o arquivo para lá.
-3. Clique em **Instalar** e preencha o e-mail e a senha da sua conta do app.
+2. No Claude, abra **Ajustes → Extensões** (em inglês, **Settings → Extensions**) e arraste o
+   arquivo para lá. No macOS e no Windows, um duplo clique no arquivo também abre a instalação;
+   no Linux, não.
+3. O Claude avisa que a extensão não é verificada: ela não tem assinatura digital. Confirme,
+   clique em **Instalar** e preencha o e-mail e a senha da sua conta do app.
 4. Em uma conversa nova, escreva por exemplo `45 almoço`.
 
 Seu e-mail e sua senha ficam guardados só no seu computador e são usados apenas para entrar no
