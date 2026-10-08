@@ -2,7 +2,7 @@
 	"manifest_version": "0.3",
 	"name": "escoladobreno",
 	"display_name": "Escola do Breno (não oficial)",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Adicione e consulte lançamentos do app Escola do Breno conversando com o Claude.",
 	"long_description": "Extensão não oficial, sem vínculo com a Escola do Breno. Diga algo como \"45 almoço\" e o Claude registra o lançamento no app: hoje, como diário, sem tags, a menos que você peça outra coisa. Também lista, corrige e apaga lançamentos, mostra o resumo do mês e cria tags e cartões.\n\nSeu e-mail e sua senha ficam guardados só neste computador e são usados apenas para entrar no app em seu nome. A extensão usa a mesma API interna do aplicativo web, que pode mudar sem aviso.",
 	"author": {
@@ -55,7 +55,7 @@
 		}
 	},
 	"compatibility": {
-		"platforms": ["darwin", "win32"],
+		"platforms": ["darwin", "win32", "linux"],
 		"runtimes": {
 			"node": ">=18.0.0"
 		}

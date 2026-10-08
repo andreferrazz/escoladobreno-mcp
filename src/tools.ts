@@ -42,7 +42,7 @@ function monthRange(value: string) {
 }
 
 export function createMcpServer(breno: BrenoClient): McpServer {
-	const server = new McpServer({ name: 'escoladobreno', version: '0.1.0' });
+	const server = new McpServer({ name: 'escoladobreno', version: '0.1.1' });
 
 	// Backend refusals and bad arguments go back as tool errors the model can read and act on.
 	const run = (work: () => Promise<unknown>) => async () => {

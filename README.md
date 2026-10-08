@@ -9,8 +9,8 @@ diz "45 almoço" e o lançamento aparece no app, sem abrir o app.
 
 ## Instalar no Claude Desktop
 
-Funciona no aplicativo Claude para **macOS e Windows**. Não funciona no claude.ai pelo navegador
-nem no celular.
+Funciona no aplicativo Claude para computador (**macOS, Windows e Linux**). Não funciona no
+claude.ai pelo navegador nem no celular.
 
 1. Baixe o arquivo `escoladobreno.mcpb` na página de
    [releases](https://github.com/andreferrazz/escoladobreno-mcp/releases/latest).
