@@ -79,6 +79,13 @@ export function createBrenoClient(options: BrenoOptions) {
 			body: JSON.stringify({ email: options.email, password: options.password }),
 			signal: AbortSignal.timeout(15_000)
 		});
+		// Supabase answers 400 for a wrong e-mail or password; say so in words the user can act on.
+		if (res.status === 400) {
+			throw new BrenoError(
+				'The Escola do Breno app refused the e-mail or password this connector is configured with. ' +
+					'Ask the user to correct them in the connector settings; nothing was read or saved.'
+			);
+		}
 		const data = (await parse(res)) as { access_token: string; user: { id: string } };
 		return { token: data.access_token, userId: data.user.id };
 	}

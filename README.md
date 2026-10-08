@@ -1,23 +1,57 @@
 # escoladobreno-mcp
 
-An MCP server for the finance app at [app.escoladobreno.com](https://app.escoladobreno.com), so
-Claude can add and look up entries without opening the app. It serves the tools over Streamable
-HTTP behind its own OAuth sign-in, which is what remote clients such as claude.ai need.
+Conecta o Claude ao app de finanças [app.escoladobreno.com](https://app.escoladobreno.com): você
+diz "45 almoço" e o lançamento aparece no app, sem abrir o app.
 
-The app has no public API. This talks to its Supabase backend the way its web client does, signed
-in as one account. An app update can change those endpoints and break a tool.
+> **Projeto não oficial.** Não tem vínculo com a Escola do Breno. Usa a mesma API interna do
+> aplicativo web, que não é pública e pode mudar sem aviso; se isso acontecer, a extensão para de
+> funcionar até ser atualizada. Use por sua conta e risco.
 
-- `POST /mcp`: the tools, bearer token required.
-- OAuth 2.1 authorization server on the same origin: dynamic client registration, PKCE, refresh
-  tokens. The consent step is a single admin password.
-- No database. Client ids, codes and tokens are HMAC-signed values, so redeploys do not sign
-  clients out. The cost: one token cannot be revoked on its own. Rotating `SIGNING_SECRET`
-  revokes everything.
+## Instalar no Claude Desktop
 
-The OAuth code (`seal.ts`, `provider.ts`, `password.ts`, `login-page.ts`, most of `app.ts`) is
-copied from `dokploy-mcp-gateway`; a fix in one belongs in the other.
+Funciona no aplicativo Claude para **macOS e Windows**. Não funciona no claude.ai pelo navegador
+nem no celular.
 
-## Tools
+1. Baixe o arquivo `escoladobreno.mcpb` na página de
+   [releases](https://github.com/andreferrazz/escoladobreno-mcp/releases/latest).
+2. Abra o arquivo (duplo clique). O Claude mostra uma tela de instalação. Se o duplo clique não
+   abrir o Claude, vá em **Ajustes → Extensões** e arraste o arquivo para lá.
+3. Clique em **Instalar** e preencha o e-mail e a senha da sua conta do app.
+4. Em uma conversa nova, escreva por exemplo `45 almoço`.
+
+Seu e-mail e sua senha ficam guardados só no seu computador e são usados apenas para entrar no
+app em seu nome. Se você digitar a senha errada, o Claude avisa no primeiro pedido; corrija nos
+ajustes da extensão.
+
+### Como usar
+
+Basta dizer o valor e a descrição. O resto segue um padrão, que você muda pedindo:
+
+| | Padrão | Para mudar, diga por exemplo |
+| --- | --- | --- |
+| Data | hoje | "ontem", "dia 3" |
+| Tipo | diário | "como entrada", "saída fixa", "no cartão", "economia" |
+| Tags | nenhuma | "com a tag mercado" |
+| Repetição | não repete | "todo mês", "em 6 parcelas" |
+
+Você também pode pedir para listar os lançamentos de um período, corrigir ou apagar um
+lançamento, ver o resumo do mês e criar tags ou cartões.
+
+---
+
+## For developers
+
+An MCP server for the app, in two forms built from the same tools:
+
+- **Desktop extension** (`src/stdio.ts`): the `.mcpb` above. Runs on the user's computer over
+  stdio with their own login.
+- **Hosted server** (`src/main.ts`): Streamable HTTP behind its own OAuth sign-in, for remote
+  clients such as claude.ai. Single account: it acts on the one login in its env vars.
+
+The app has no public API. `src/breno.ts` talks to its Supabase backend the way its web client
+does.
+
+### Tools
 
 | Tool | What it does |
 | --- | --- |
@@ -39,31 +73,45 @@ given a card is saved on the due date of the invoice the purchase falls into, as
 Series deletes, account reset and profile calls exist in the backend and are deliberately not
 exposed.
 
-## Configuration
-
-See `.env.example`.
-
-```sh
-openssl rand -hex 32   # SIGNING_SECRET
-pnpm hash-password     # ADMIN_PASSWORD_HASH, prompts for the password
-```
-
-## Develop
+### Develop
 
 ```sh
 pnpm install
 pnpm check
-pnpm test              # OAuth flow and every tool, against a fake backend
+pnpm test              # OAuth flow, every tool and the bundled extension, against a fake backend
 pnpm smoke             # live: needs BRENO_EMAIL and BRENO_PASSWORD in .env
-pnpm dev               # needs the full .env
+pnpm pack:extension    # writes escoladobreno.mcpb
+pnpm dev               # hosted server; needs the full .env
 ```
 
 `pnpm smoke` writes one R$ 0.01 entry named "TESTE MCP (apagar)" to the real account, then
 updates and deletes it. Run it after the app ships an update to see whether the endpoints
 still behave.
 
-## Deploy
+### The desktop extension
 
-Build the `Dockerfile`, set the variables above, route a domain to port 3000. `PUBLIC_URL` must
-be that domain's `https://` origin. In claude.ai, add a custom connector with the URL
+`extension/manifest.json` describes it; `scripts/build-extension.ts` bundles `src/stdio.ts` and
+its dependencies into one CommonJS file (Claude Desktop runs it with its own Node, version
+unspecified, so it targets Node 18) and packs it with `mcpb`. Keep the manifest's `version` equal
+to `package.json`'s; the build refuses otherwise. To release, attach the `.mcpb` to a GitHub
+release.
+
+### The hosted server
+
+- `POST /mcp`: the tools, bearer token required.
+- OAuth 2.1 authorization server on the same origin: dynamic client registration, PKCE, refresh
+  tokens. The consent step is a single admin password.
+- No database. Client ids, codes and tokens are HMAC-signed values, so redeploys do not sign
+  clients out. The cost: one token cannot be revoked on its own. Rotating `SIGNING_SECRET`
+  revokes everything.
+
+Configuration is in `.env.example`:
+
+```sh
+openssl rand -hex 32   # SIGNING_SECRET
+pnpm hash-password     # ADMIN_PASSWORD_HASH, prompts for the password
+```
+
+Build the `Dockerfile`, set those variables, route a domain to port 3000. `PUBLIC_URL` must be
+that domain's `https://` origin. In claude.ai, add a custom connector with the URL
 `<PUBLIC_URL>/mcp`; in Claude Code, `claude mcp add --transport http escoladobreno <PUBLIC_URL>/mcp`.

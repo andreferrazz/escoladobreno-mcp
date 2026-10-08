@@ -1,0 +1,63 @@
+{
+	"manifest_version": "0.3",
+	"name": "escoladobreno",
+	"display_name": "Escola do Breno (não oficial)",
+	"version": "0.1.0",
+	"description": "Adicione e consulte lançamentos do app Escola do Breno conversando com o Claude.",
+	"long_description": "Extensão não oficial, sem vínculo com a Escola do Breno. Diga algo como \"45 almoço\" e o Claude registra o lançamento no app: hoje, como diário, sem tags, a menos que você peça outra coisa. Também lista, corrige e apaga lançamentos, mostra o resumo do mês e cria tags e cartões.\n\nSeu e-mail e sua senha ficam guardados só neste computador e são usados apenas para entrar no app em seu nome. A extensão usa a mesma API interna do aplicativo web, que pode mudar sem aviso.",
+	"author": {
+		"name": "André Ferraz",
+		"url": "https://github.com/andreferrazz"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/andreferrazz/escoladobreno-mcp"
+	},
+	"homepage": "https://github.com/andreferrazz/escoladobreno-mcp",
+	"support": "https://github.com/andreferrazz/escoladobreno-mcp/issues",
+	"server": {
+		"type": "node",
+		"entry_point": "server/index.cjs",
+		"mcp_config": {
+			"command": "node",
+			"args": ["${__dirname}/server/index.cjs"],
+			"env": {
+				"BRENO_EMAIL": "${user_config.email}",
+				"BRENO_PASSWORD": "${user_config.password}"
+			}
+		}
+	},
+	"tools": [
+		{ "name": "add_entry", "description": "Adiciona um lançamento, único ou repetido" },
+		{ "name": "list_entries", "description": "Lista lançamentos de um período" },
+		{ "name": "update_entry", "description": "Altera um lançamento" },
+		{ "name": "delete_entry", "description": "Apaga um lançamento" },
+		{ "name": "month_summary", "description": "Totais do mês" },
+		{ "name": "list_tags", "description": "Lista as tags" },
+		{ "name": "create_tag", "description": "Cria uma tag" },
+		{ "name": "list_cards", "description": "Lista os cartões de crédito" },
+		{ "name": "create_card", "description": "Cadastra um cartão de crédito" }
+	],
+	"keywords": ["finanças", "escola do breno", "planilha do breno"],
+	"user_config": {
+		"email": {
+			"type": "string",
+			"title": "E-mail",
+			"description": "O e-mail da sua conta em app.escoladobreno.com",
+			"required": true
+		},
+		"password": {
+			"type": "string",
+			"title": "Senha",
+			"description": "A senha da sua conta. Fica guardada neste computador.",
+			"sensitive": true,
+			"required": true
+		}
+	},
+	"compatibility": {
+		"platforms": ["darwin", "win32"],
+		"runtimes": {
+			"node": ">=18.0.0"
+		}
+	}
+}

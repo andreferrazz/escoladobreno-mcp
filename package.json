@@ -12,7 +12,8 @@
 		"check": "tsc --noEmit",
 		"test": "node --test test/*.test.ts",
 		"smoke": "node --env-file=.env scripts/smoke.ts",
-		"hash-password": "node scripts/hash-password.ts"
+		"hash-password": "node scripts/hash-password.ts",
+		"pack:extension": "node scripts/build-extension.ts"
 	},
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "^1.32.1",
@@ -20,8 +21,10 @@
 		"zod": "^4.6.5"
 	},
 	"devDependencies": {
+		"@anthropic-ai/mcpb": "^2.1.2",
 		"@types/express": "^5.0.6",
 		"@types/node": "^24.19.1",
+		"esbuild": "^0.28.2",
 		"typescript": "^7.0.2"
 	},
 	"packageManager": "pnpm@10.33.2"
