@@ -88,8 +88,8 @@ No plano gratuito do Claude é possível ter um conector personalizado.
 ### Atualizar ou apagar
 
 A sua cópia fica na versão em que foi criada. Se o app mudar e o conector parar de funcionar,
-veja se há versão nova aqui; para atualizar, no seu GitHub abra a sua cópia do projeto e use
-**Sync fork**, ou apague o projeto na Vercel e clique no botão de novo.
+veja se há versão nova aqui. Para atualizar, apague a sua cópia (abaixo) e clique no botão de
+novo, usando os mesmos três campos; depois remova e adicione o conector no Claude.
 
 Para apagar tudo: na Vercel, **Settings → Delete Project**; no GitHub, apague a cópia do
 repositório; no Claude, remova o conector.
