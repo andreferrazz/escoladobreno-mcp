@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { createHash, randomBytes } from 'node:crypto';
 import { createServer, type IncomingMessage, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { createApp } from '../src/app.ts';
+import { createApp } from '../src/http.ts';
 import type { BrenoOptions } from '../src/breno.ts';
 import { hashPassword } from '../src/password.ts';
 

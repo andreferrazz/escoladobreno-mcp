@@ -1,4 +1,4 @@
-import { createApp } from './app.ts';
+import { createApp } from './http.ts';
 import { loadConfig } from './config.ts';
 
 const config = loadConfig();

@@ -33,6 +33,13 @@ export function createApp(config: Config, breno: BrenoClient = createBrenoClient
 
 	app.get('/healthz', (_req, res) => void res.json({ status: 'ok' }));
 
+	// What someone sees when they open the address after deploying: the one thing to do next.
+	app.get('/', (_req, res) => {
+		res
+			.type('text')
+			.send(`Conector Escola do Breno (não oficial) no ar.\n\nNo Claude, adicione um conector personalizado com este endereço:\n${mcpUrl.href}\n`);
+	});
+
 	app.use(
 		mcpAuthRouter({
 			provider,

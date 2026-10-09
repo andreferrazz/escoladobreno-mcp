@@ -7,6 +7,14 @@ diz "45 almoço" e o lançamento aparece no app, sem abrir o app.
 > aplicativo web, que não é pública e pode mudar sem aviso; se isso acontecer, a extensão para de
 > funcionar até ser atualizada. Use por sua conta e risco.
 
+Há duas formas de usar, e você pode escolher só uma:
+
+| | Extensão para o Claude Desktop | Conector na nuvem |
+| --- | --- | --- |
+| Funciona em | aplicativo Claude no computador | computador, navegador (claude.ai) e celular |
+| Instalação | um arquivo, 2 minutos | uns 10 minutos, com contas na Vercel e no GitHub |
+| Onde fica sua senha do app | no seu computador | no seu projeto na Vercel |
+
 ## Instalar no Claude Desktop
 
 Funciona no aplicativo Claude para computador (**macOS, Windows e Linux**). Não funciona no
@@ -39,6 +47,53 @@ Basta dizer o valor e a descrição. O resto segue um padrão, que você muda pe
 Você também pode pedir para listar os lançamentos de um período, corrigir ou apagar um
 lançamento, ver o resumo do mês e criar tags ou cartões.
 
+## Conector na nuvem (para usar também no celular)
+
+Você cria a sua própria cópia do conector, gratuita, na [Vercel](https://vercel.com). Ela é só
+sua: ninguém mais tem acesso, e sua senha do app fica guardada na sua conta da Vercel.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fandreferrazz%2Fescoladobreno-mcp&env=BRENO_EMAIL,BRENO_PASSWORD,CONNECTOR_PASSWORD&envDescription=E-mail%20e%20senha%20do%20app%20Escola%20do%20Breno%2C%20e%20uma%20senha%20nova%20(12%2B%20caracteres)%20para%20proteger%20o%20conector.&envLink=https%3A%2F%2Fgithub.com%2Fandreferrazz%2Fescoladobreno-mcp%23os-tr%C3%AAs-campos&project-name=escoladobreno-mcp&repository-name=escoladobreno-mcp)
+
+1. Clique no botão acima. Entre na Vercel (ou crie uma conta gratuita) usando o GitHub; se você
+   não tem conta no GitHub, a Vercel oferece criar uma no mesmo passo.
+2. A Vercel copia este projeto para o seu GitHub. Aceite o nome sugerido.
+3. Preencha os três campos (veja abaixo) e clique em **Deploy**. Leva cerca de um minuto.
+4. Ao terminar, abra o endereço do projeto (algo como `https://escoladobreno-mcp-xxxx.vercel.app`).
+   A página mostra o endereço do conector, terminado em `/mcp`. Copie esse endereço.
+5. No Claude, vá em **Personalizar → Conectores → Adicionar → Adicionar conector personalizado**
+   (em inglês, **Customize → Connectors → Add → Add custom connector**) e cole o endereço.
+6. O Claude abre uma página pedindo uma senha: é a **senha do conector** que você criou no
+   passo 3. Depois disso, escreva `45 almoço` em uma conversa nova.
+
+No plano gratuito do Claude é possível ter um conector personalizado.
+
+### Os três campos
+
+| Campo | O que colocar |
+| --- | --- |
+| `BRENO_EMAIL` | O e-mail da sua conta em app.escoladobreno.com |
+| `BRENO_PASSWORD` | A senha da sua conta do app |
+| `CONNECTOR_PASSWORD` | Uma senha **nova**, inventada agora, com pelo menos 12 caracteres. Ela protege o seu conector: quem souber essa senha consegue ver e alterar seus lançamentos. Não reutilize a senha do app. |
+
+### Se algo der errado
+
+- **A página mostra "O conector não está configurado".** Ela diz qual campo está errado. Corrija
+  em **Settings → Environment Variables** no projeto da Vercel e depois, em **Deployments**,
+  escolha **Redeploy**.
+- **O Claude diz que o app recusou o e-mail ou a senha.** `BRENO_EMAIL` ou `BRENO_PASSWORD`
+  está errado; corrija do mesmo jeito.
+- **Você trocou a senha do app.** Atualize `BRENO_PASSWORD` na Vercel e faça **Redeploy**. O
+  Claude vai pedir a senha do conector de novo.
+
+### Atualizar ou apagar
+
+A sua cópia fica na versão em que foi criada. Se o app mudar e o conector parar de funcionar,
+veja se há versão nova aqui; para atualizar, no seu GitHub abra a sua cópia do projeto e use
+**Sync fork**, ou apague o projeto na Vercel e clique no botão de novo.
+
+Para apagar tudo: na Vercel, **Settings → Delete Project**; no GitHub, apague a cópia do
+repositório; no Claude, remova o conector.
+
 ---
 
 ## For developers
@@ -47,8 +102,9 @@ An MCP server for the app, in two forms built from the same tools:
 
 - **Desktop extension** (`src/stdio.ts`): the `.mcpb` above. Runs on the user's computer over
   stdio with their own login.
-- **Hosted server** (`src/main.ts`): Streamable HTTP behind its own OAuth sign-in, for remote
-  clients such as claude.ai. Single account: it acts on the one login in its env vars.
+- **Hosted server** (`src/main.ts`, or `src/server.ts` on Vercel): Streamable HTTP behind its own
+  OAuth sign-in, for remote clients such as claude.ai. Single account: it acts on the one login
+  in its env vars.
 
 The app has no public API. `src/breno.ts` talks to its Supabase backend the way its web client
 does.
@@ -107,13 +163,28 @@ release.
   clients out. The cost: one token cannot be revoked on its own. Rotating `SIGNING_SECRET`
   revokes everything.
 
-Configuration is in `.env.example`:
+There are two ways to configure the sign-in (`src/config.ts`):
 
-```sh
-openssl rand -hex 32   # SIGNING_SECRET
-pnpm hash-password     # ADMIN_PASSWORD_HASH, prompts for the password
-```
+- **Administered server**, as in `.env.example`: `PUBLIC_URL`, `SIGNING_SECRET` and
+  `ADMIN_PASSWORD_HASH`.
 
-Build the `Dockerfile`, set those variables, route a domain to port 3000. `PUBLIC_URL` must be
-that domain's `https://` origin. In claude.ai, add a custom connector with the URL
-`<PUBLIC_URL>/mcp`; in Claude Code, `claude mcp add --transport http escoladobreno <PUBLIC_URL>/mcp`.
+  ```sh
+  openssl rand -hex 32   # SIGNING_SECRET
+  pnpm hash-password     # ADMIN_PASSWORD_HASH, prompts for the password
+  ```
+
+  Build the `Dockerfile`, set the variables, route a domain to port 3000. `PUBLIC_URL` must be
+  that domain's `https://` origin.
+
+- **One-click deployment**: only `CONNECTOR_PASSWORD` (12+ characters). The signing secret is
+  then derived from it and the app password, so every serverless instance agrees on it and
+  changing either password signs clients out; the public URL comes from
+  `VERCEL_PROJECT_PRODUCTION_URL`. Vercel runs `src/server.ts` as a single function with no
+  build step or `vercel.json`.
+
+  On Vercel the sign-in lockout and the single-use check on authorization codes are kept in
+  memory per instance, so they are best-effort there. The password length minimum and the
+  scrypt hash are what stand against guessing.
+
+In claude.ai, add a custom connector with the URL `<PUBLIC_URL>/mcp`; in Claude Code,
+`claude mcp add --transport http escoladobreno <PUBLIC_URL>/mcp`.
